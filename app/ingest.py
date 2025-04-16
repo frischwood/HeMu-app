@@ -4,8 +4,9 @@ from datetime import datetime
 from convert import convert_netcdf_to_cog
 from db import SessionLocal, MapRecord
 from sqlalchemy.exc import OperationalError
-DATA_DIR = "data/netcdf"  # directory where new NetCDF files appear
-VARIABLE = "SISGHI-No-Horizon" # default variable to extract
+
+VARIABLE = os.environ["VARIABLE"]
+DATA_DIR = os.environ["DATA_DIR"]
 
 def ingest_new_data():
     for i in range(5):
@@ -27,14 +28,14 @@ def ingest_new_data():
         try:
             cog_path, timestamp = convert_netcdf_to_cog(path, variable_name=VARIABLE)
             print(f"cog_path: {cog_path}")
-            date = datetime.strptime(timestamp, "%Y-%m-%d").date()
+            print(f"Timestamp: {timestamp}")
             # Check if already in DB
-            exists = db.query(MapRecord).filter_by(acquisition_date=date).first()
+            exists = db.query(MapRecord).filter_by(acquisition_datetime=timestamp).first()
             if exists:
                 print(f"✅ Already ingested: {filename}")
                 continue
             # Insert into DB
-            record = MapRecord(acquisition_date=date, filepath=str(cog_path))
+            record = MapRecord(acquisition_datetime=timestamp, filepath=str(cog_path))
             db.add(record)
             db.commit()
             print(f"✅ Ingested: {filename}")

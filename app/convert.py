@@ -1,7 +1,11 @@
+import os
 import xarray as xr
 import rioxarray
+from pandas import to_datetime
 from pathlib import Path
 import datetime
+
+DATETIME_FORMAT = os.environ["DATETIME_FORMAT"]
 
 def convert_netcdf_to_cog(netcdf_path, variable_name, output_dir="data/cogs", time_index=0):
     netcdf_path = Path(netcdf_path)
@@ -16,10 +20,11 @@ def convert_netcdf_to_cog(netcdf_path, variable_name, output_dir="data/cogs", ti
     # Handle time-indexed or static data
     if "time" in ds.dims:
         da = ds[variable_name].isel(time=time_index)
-        timestamp = str(ds.time.values[time_index])[:10]
+        # timestamp = str(ds.time.values[time_index])[:10]
+        timestamp = to_datetime(ds.time.values[time_index]).strftime(format=DATETIME_FORMAT)
     else:
         da = ds[variable_name]
-        timestamp = datetime.date.today().isoformat()
+        timestamp = to_datetime(datetime.datetime.now(), format=DATETIME_FORMAT)
 
     # Ensure georeferencing
     da.rio.set_spatial_dims(x_dim="x", y_dim="y", inplace=True)

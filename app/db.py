@@ -1,4 +1,4 @@
-from sqlalchemy import create_engine, Column, Integer, String, Date, Text
+from sqlalchemy import create_engine, Column, Integer, String, Date, DateTime, Text
 from sqlalchemy.orm import sessionmaker, declarative_base
 import os
 
@@ -9,5 +9,5 @@ Base = declarative_base()
 class MapRecord(Base):
     __tablename__ = "maps"
     id = Column(Integer, primary_key=True, index=True)
-    acquisition_date = Column(Date)
+    acquisition_datetime = Column(DateTime)
     filepath = Column(Text)

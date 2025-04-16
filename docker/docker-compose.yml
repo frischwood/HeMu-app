@@ -36,3 +36,6 @@ services:
       - backend
     environment:
       - DATABASE_URL=${DATABASE_URL}
+      - DATA_DIR=${DATA_DIR}
+      - VARIABLE=${VARIABLE}
+      - DATETIME_FORMAT=${DATETIME_FORMAT}

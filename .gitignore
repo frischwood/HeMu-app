@@ -6,6 +6,8 @@
 # Data files
 data/cogs/*
 !data/cogs/.gitkeep
+data/netcdf/*
+!data/netcdf/SISGHI-No-Horizon_2024-01-03T105743.nc
 
 # Python
 __pycache__/

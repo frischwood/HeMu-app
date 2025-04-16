@@ -49,7 +49,7 @@ def download_data(start_date: date, end_date: date,
 def get_timestamps():
     db = SessionLocal()
     try:
-        results = db.execute(select(MapRecord.acquisition_date)).fetchall()
-        return sorted([r[0].isoformat() for r in results])
+        results = db.execute(select(MapRecord.acquisition_datetime)).fetchall()
+        return sorted([r[0] for r in results])
     finally:
         db.close()

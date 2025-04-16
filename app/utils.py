@@ -5,7 +5,7 @@ def build_spatiotemporal_query(start_date, end_date, bbox):
     """
     query = """
     SELECT * FROM maps
-    WHERE acquisition_date BETWEEN :start AND :end
+    WHERE acquisition_datetime BETWEEN :start AND :end
       AND ST_Intersects(
             ST_SetSRID(ST_MakeBox2D(
                 ST_Point(:xmin, :ymin),
