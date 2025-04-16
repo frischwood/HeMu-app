@@ -1,0 +1,16 @@
+# Environment variables
+.env
+.env.*
+!.env.template
+
+# Data files
+data/cogs/*
+!data/cogs/.gitkeep
+
+# Python
+__pycache__/
+*.pyc
+
+# IDE
+.vscode/
+.idea/

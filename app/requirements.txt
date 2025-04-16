@@ -1,0 +1,9 @@
+fastapi
+uvicorn
+sqlalchemy
+psycopg2-binary
+xarray
+netcdf4
+rioxarray
+rasterio
+python-multipart

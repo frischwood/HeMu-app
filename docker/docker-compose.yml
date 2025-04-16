@@ -1,0 +1,38 @@
+version: '3.8'
+
+services:
+  titiler:
+    image: ghcr.io/developmentseed/titiler:latest
+    platform: linux/amd64
+    ports:
+      - "8001:8000"
+    volumes:
+      - ../data/cogs:/opt/cogs
+    environment:
+      - TITILER_API_PREFIX=${TITILER_API_PREFIX}
+      - CORS_ORIGINS=${CORS_ORIGINS}
+      - CORS_METHODS=${CORS_METHODS}
+      - CORS_HEADERS=${CORS_HEADERS}
+    command: uvicorn titiler.application.main:app --host 0.0.0.0 --port 8000
+
+  backend:
+    build:
+      context: ../app
+    ports:
+      - "8000:8000"
+    depends_on:
+      - titiler
+    environment:
+      - DATABASE_URL=${DATABASE_URL}
+
+  cron-ingest:
+    build:
+      context: ../app
+    volumes:
+      - ../data:/app/data
+      - ../app:/app
+    entrypoint: ["python", "/app/ingest.py"]
+    depends_on:
+      - backend
+    environment:
+      - DATABASE_URL=${DATABASE_URL}

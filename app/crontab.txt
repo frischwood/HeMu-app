@@ -1,0 +1,3 @@
+# Run every Monday at 3:30 AM
+30 3 * * 1 python3 /app/ingest.py >> /app/cron.log 2>&1
+
