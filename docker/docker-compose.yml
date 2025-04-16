@@ -7,7 +7,7 @@ services:
     ports:
       - "8001:8000"
     volumes:
-      - ../data/cogs:/opt/cogs
+      - ../data/cogs:/opt/cogs:ro
     environment:
       - TITILER_API_PREFIX=${TITILER_API_PREFIX}
       - CORS_ORIGINS=${CORS_ORIGINS}

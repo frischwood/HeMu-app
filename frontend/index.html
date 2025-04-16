@@ -1,66 +1,59 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Map Viewer</title>
-  <script src='https://unpkg.com/maplibre-gl@latest/dist/maplibre-gl.js'></script>
-  <link href='https://unpkg.com/maplibre-gl@latest/dist/maplibre-gl.css' rel='stylesheet' />
-  <style>
-    body {
-      margin: 0;
-      font-family: sans-serif;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-    }
-    #map {
-      width: 90vw;
-      height: 70vh;
-      margin-top: 1rem;
-      border: 2px solid #ccc;
-      border-radius: 8px;
-    }
-    .controls {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      margin-top: 1rem;
-    }
-    .controls label,
-    .controls select,
-    .controls input,
-    .controls span,
-    .controls p {
-      margin: 0.5rem;
-      font-size: 1rem;
-    }
-  </style>
+    <title>Map Viewer</title>
+    <script src='https://unpkg.com/maplibre-gl@latest/dist/maplibre-gl.js'></script>
+    <link href='https://unpkg.com/maplibre-gl@latest/dist/maplibre-gl.css' rel='stylesheet' />
+    <link href='styles.css' rel='stylesheet' />
 </head>
 <body>
-  <div id="map"></div>
+    <div id="map"></div>
 
-  <div class="controls">
-    <p id="range-info">Loading date range...</p>
+    <div class="controls">
+        <p id="range-info">Loading date range...</p>
 
-    <label for="date-slider">Date:</label>
-    <input type="range" id="date-slider" min="0" value="0" step="1">
-    <span id="current-date"></span>
+        <div class="control-row">
+            <label for="date-slider">Date:</label>
+            <input type="range" id="date-slider" min="0" value="0" step="1">
+            <span id="current-date"></span>
+        </div>
 
-    <label for="basemap-select">Basemap:</label>
-    <select id="basemap-select">
-      <option value="osm">OSM</option>
-      <option value="google">Google Maps</option>
-      <option value="adminCH">ADMIN CH</option>
-    </select>
+        <div class="control-row">
+            <div class="control-group">
+                <label for="basemap-select">Basemap:</label>
+                <select id="basemap-select">
+                    <option value="osm">OSM</option>
+                    <option value="google">Google Maps</option>
+                    <option value="adminCH">ADMIN CH</option>
+                </select>
+            </div>
+            <div class="control-group">
+                <label for="basemap-opacity">Opacity:</label>
+                <input type="range" id="basemap-opacity" min="0" max="100" value="100">
+                <span id="basemap-opacity-value">100%</span>
+            </div>
+        </div>
 
-    <label for="data-layer">Data Layer:</label>
-    <select id="data-layer">
-        <option value="SISGHI-No-Horizon">SISGHI-No-Horizon</option>
-    </select>
-  </div>
-  <div id="message-container" style="position: absolute; top: 10px; right: 10px; background: rgba(255,255,255,0.9); padding: 10px; border-radius: 4px; z-index: 1000;">
-    <div id="debug"></div>
-    <div id="error" style="color: red;"></div>
-  </div>
-  <script src="app.js"></script>
+        <div class="control-row">
+            <div class="control-group">
+                <label for="data-layer">Data Layer:</label>
+                <select id="data-layer">
+                    <option value="SISGHI-No-Horizon">SISGHI-No-Horizon</option>
+                </select>
+            </div>
+            <div class="control-group">
+                <label for="data-opacity">Opacity:</label>
+                <input type="range" id="data-opacity" min="0" max="100" value="80">
+                <span id="data-opacity-value">80%</span>
+            </div>
+        </div>
+    </div>
+
+    <div id="message-container">
+        <div id="debug"></div>
+        <div id="error"></div>
+    </div>
+
+    <script src="app.js"></script>
 </body>
 </html>
