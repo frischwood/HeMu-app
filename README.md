@@ -7,8 +7,8 @@
 ## Setup
 1. Clone the repository:
 ```bash
-git clone https://github.com/yourusername/heliomont_dml.git
-cd heliomont_dml
+git clone https://github.com/frischwood/HeMu-app.git
+cd HeMu-app 
 ```
 
 2. Environment Configuration:
