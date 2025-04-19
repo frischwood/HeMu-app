@@ -47,9 +47,10 @@ def download_data(start_date: date, end_date: date,
 
 @app.get("/timestamps")
 def get_timestamps():
+    datetime_format = os.getenv('DATETIME_FORMAT', '%Y%m%dT%H%M%S')
     db = SessionLocal()
     try:
         results = db.execute(select(MapRecord.acquisition_datetime)).fetchall()
-        return sorted([r[0] for r in results])
+        return sorted([r[0].strftime(datetime_format) for r in results])
     finally:
         db.close()

@@ -26,10 +26,9 @@ def ingest_new_data():
             continue
         path = os.path.join(DATA_DIR, filename)
         try:
-            cog_path, timestamp = convert_netcdf_to_cog(path, variable_name=VARIABLE)
+            cog_path, timestamp, data_min, data_max = convert_netcdf_to_cog(path, variable_name=VARIABLE)
             print(f"cog_path: {cog_path}")
             print(f"Timestamp: {timestamp}")
-
             # Modify the path to match what titiler expects
             relative_path = os.path.relpath(str(cog_path), "data/cogs")
             titiler_path = f"/opt/cogs/{relative_path}"
