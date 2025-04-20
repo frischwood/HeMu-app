@@ -26,7 +26,7 @@ def ingest_new_data():
             continue
         path = os.path.join(DATA_DIR, filename)
         try:
-            cog_path, timestamp, data_min, data_max = convert_netcdf_to_cog(path, variable_name=VARIABLE)
+            cog_path, timestamp, vmin, vmax = convert_netcdf_to_cog(path, variable_name=VARIABLE)
             print(f"cog_path: {cog_path}")
             print(f"Timestamp: {timestamp}")
             # Modify the path to match what titiler expects
@@ -38,7 +38,7 @@ def ingest_new_data():
                 print(f"✅ Already ingested: {filename}")
                 continue
             # Insert into DB
-            record = MapRecord(acquisition_datetime=timestamp, filepath=titiler_path)
+            record = MapRecord(acquisition_datetime=timestamp, filepath=titiler_path, vmin=vmin, vmax=vmax)
             db.add(record)
             db.commit()
             print(f"✅ Ingested: {filename} with path {titiler_path}")

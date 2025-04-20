@@ -50,7 +50,20 @@ def get_timestamps():
     datetime_format = os.getenv('DATETIME_FORMAT', '%Y%m%dT%H%M%S')
     db = SessionLocal()
     try:
-        results = db.execute(select(MapRecord.acquisition_datetime)).fetchall()
-        return sorted([r[0].strftime(datetime_format) for r in results])
+        # Fetch datetime, vmin, and vmax
+        results = db.execute(
+            select(
+                MapRecord.acquisition_datetime,
+                MapRecord.vmin,
+                MapRecord.vmax
+            )
+        ).fetchall()
+        
+        # Return list of dicts with all needed information
+        return sorted([{
+            'datetime': r[0].strftime(datetime_format),
+            'vmin': r[1],
+            'vmax': r[2]
+        } for r in results], key=lambda x: x['datetime'])
     finally:
         db.close()

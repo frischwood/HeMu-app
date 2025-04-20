@@ -25,20 +25,37 @@ let map = new maplibregl.Map({
 });
 
 let dates = [];
+let scalingParams = {};  // Store vmin/vmax for each date
+
 fetch('http://localhost:8000/timestamps')
     .then(res => res.json())
-    .then(ts => {
-        const rangeInfo = document.getElementById("range-info");
-        if (ts.length === 0) {
-            rangeInfo.textContent = "No data available.";
+    .then(data => {
+        if (data.length === 0) {
+            document.getElementById("range-info").textContent = "No data available.";
             return;
         }
-        dates = ts;
+        
+        // Store dates and scaling parameters
+        dates = data.map(item => item.datetime);
+        data.forEach(item => {
+            scalingParams[item.datetime] = {
+                vmin: item.vmin,
+                vmax: item.vmax
+            };
+            console.log(`📊 Scaling for ${item.datetime}:`, {
+                vmin: item.vmin,
+                vmax: item.vmax
+            });
+        });
+
         const slider = document.getElementById("date-slider");
         slider.max = dates.length - 1;
         slider.value = 0;
+        
         document.getElementById("current-date").textContent = dates[0];
-        rangeInfo.textContent = `Available range: ${dates[0]} to ${dates[dates.length - 1]}`;
+        document.getElementById("range-info").textContent = 
+            `Available range: ${dates[0]} to ${dates[dates.length - 1]}`;
+        
         updateLayerByTime(0);
     });
 
@@ -51,9 +68,10 @@ function updateLayerByTime(index) {
     }
     
     const date = dates[index];
+    const scaling = scalingParams[date];
+    console.log(`🎯 Using scaling for ${date}:`, scaling);
     const variable = document.getElementById("data-layer").value;
     const tiffName = `${variable}_${date}.tif`;
-    // Use direct path without file:// protocol
     const tiffPath = `/opt/cogs/${tiffName}`;
     
     console.log('📂 Loading file:', tiffPath);
@@ -79,11 +97,15 @@ function updateLayerByTime(index) {
                 map.removeSource('dataLayer');
             }
 
-            // Construct tile URL with direct path
-            const tileUrl = `http://localhost:8001/cog/tiles/{z}/{x}/{y}.png?url=${encodeURIComponent(tiffPath)}`; //{encodeURIComponent(tiffPath)}
-            console.log('🔗 New tile URL:', tileUrl);
+            // Add scaling parameters to the tile URL
+            const tileUrl = `http://localhost:8001/cog/tiles/{z}/{x}/{y}.png?url=${encodeURIComponent(tiffPath)}&rescale=${scaling.vmin},${scaling.vmax}`;
+            console.log('🔍 Constructed URL with rescale:', {
+                url: tileUrl,
+                vmin: scaling.vmin,
+                vmax: scaling.vmax
+            });
 
-            // Add new source
+            // Add new source with rescaled values
             map.addSource('dataLayer', {
                 type: 'raster',
                 tiles: [tileUrl],
@@ -123,7 +145,6 @@ function updateLayerByTime(index) {
 }
 
 document.getElementById("date-slider").addEventListener("input", (e) => {
-    // updateLayerByTime(parseInt(e.target.value));
     const index = parseInt(e.target.value);
     console.log('🎚️ Slider changed:', { index, date: dates[index] });
     document.getElementById("current-date").textContent = dates[index];

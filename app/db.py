@@ -1,4 +1,4 @@
-from sqlalchemy import create_engine, Column, Integer, String, Date, DateTime, Text
+from sqlalchemy import create_engine, Column, Integer, Float, String, Date, DateTime, Text
 from sqlalchemy.orm import sessionmaker, declarative_base
 import os
 
@@ -11,3 +11,5 @@ class MapRecord(Base):
     id = Column(Integer, primary_key=True, index=True)
     acquisition_datetime = Column(DateTime)
     filepath = Column(Text)
+    vmin = Column(Float)
+    vmax = Column(Float)
