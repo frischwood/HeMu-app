@@ -73,6 +73,7 @@ function updateLayerByTime(index) {
     const variable = document.getElementById("data-layer").value;
     const tiffName = `${variable}_${date}.tif`;
     const tiffPath = `/opt/cogs/${tiffName}`;
+    const colormap = document.getElementById("colormap-select").value;
     
     console.log('📂 Loading file:', tiffPath);
     
@@ -97,12 +98,13 @@ function updateLayerByTime(index) {
                 map.removeSource('dataLayer');
             }
 
-            // Add scaling parameters to the tile URL
-            const tileUrl = `http://localhost:8001/cog/tiles/{z}/{x}/{y}.png?url=${encodeURIComponent(tiffPath)}&rescale=${scaling.vmin},${scaling.vmax}`;
-            console.log('🔍 Constructed URL with rescale:', {
+            // Add scaling parameters and colormap to the tile URL
+            const tileUrl = `http://localhost:8001/cog/tiles/WebMercatorQuad/{z}/{x}/{y}.png?url=${encodeURIComponent(tiffPath)}&rescale=${scaling.vmin},${scaling.vmax}&colormap_name=${colormap}`;
+            console.log('🔍 Constructed URL with WebMercatorQuad tiles:', {
                 url: tileUrl,
                 vmin: scaling.vmin,
-                vmax: scaling.vmax
+                vmax: scaling.vmax,
+                colormap: colormap
             });
 
             // Add new source with rescaled values
@@ -179,6 +181,11 @@ document.getElementById("data-opacity").addEventListener("input", (e) => {
         map.setPaintProperty('data-layer', 'raster-opacity', opacity);
     }
     document.getElementById("data-opacity-value").textContent = `${e.target.value}%`;
+});
+
+// Add after your other event listeners
+document.getElementById("colormap-select").addEventListener("change", () => {
+    updateLayerByTime(document.getElementById("date-slider").value);
 });
 
 // Add event listener for map load
