@@ -83,37 +83,21 @@
         }
         
         .sidebar-toggle {
-            position: fixed !important;
-            top: 20px !important;
-            right: 20px !important;
-            background: rgba(26, 26, 26, 0.9) !important;
-            backdrop-filter: blur(10px) !important;
-            border: 1px solid rgba(255, 255, 255, 0.2) !important;
+            background: rgba(255, 255, 255, 0.1) !important;
+            border: none !important;
             color: #fff !important;
-            width: 40px !important;
-            height: 40px !important;
-            border-radius: 8px !important;
+            width: 32px !important;
+            height: 32px !important;
+            border-radius: 6px !important;
             cursor: pointer !important;
             display: flex !important;
             align-items: center !important;
             justify-content: center !important;
-            transition: all 0.3s ease !important;
-            z-index: 1001 !important;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3) !important;
+            transition: all 0.2s ease !important;
         }
         
         .sidebar-toggle:hover {
-            background: rgba(96, 165, 250, 0.2) !important;
-            border-color: #60a5fa !important;
-            transform: scale(1.05) !important;
-        }
-        
-        .sidebar.collapsed .sidebar-toggle {
-            right: 20px !important;
-        }
-        
-        .sidebar:not(.collapsed) .sidebar-toggle {
-            right: 400px !important;
+            background: rgba(255, 255, 255, 0.2) !important;
         }
         
         .sidebar-content {
@@ -215,21 +199,28 @@
             align-items: center !important;
             justify-content: center !important;
         }
+        
+        /* Debug styles */
+        .sidebar {
+            border: 2px solid red !important; /* Temporary debug border */
+        }
+        
+        #map {
+            border: 2px solid blue !important; /* Temporary debug border */
+        }
     </style>
 </head>
 <body>
     <!-- Full-screen map container -->
     <div id="map"></div>
     
-    <!-- Sidebar toggle button (always visible) -->
-    <button id="sidebar-toggle" class="sidebar-toggle" aria-label="Toggle sidebar">
-        <i class="fas fa-chevron-right"></i>
-    </button>
-    
     <!-- Collapsible sidebar -->
     <div id="sidebar" class="sidebar">
         <div class="sidebar-header">
-            <h2><i class="fas fa-sun"></i> HeMu Viewer</h2>
+            <h2><i class="fas fa-sun"></i> Solar Irradiance</h2>
+            <button id="sidebar-toggle" class="sidebar-toggle" aria-label="Toggle sidebar">
+                <i class="fas fa-chevron-left"></i>
+            </button>
         </div>
         
         <div class="sidebar-content">

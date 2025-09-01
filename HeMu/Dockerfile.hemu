@@ -1,0 +1,43 @@
+FROM python:3.10-slim
+
+# Install system dependencies
+RUN apt-get update && apt-get install -y \
+    gcc g++ \
+    gdal-bin libgdal-dev libgeos-dev libproj-dev \
+    netcdf-bin libnetcdf-dev \
+    build-essential curl git unzip \
+    && rm -rf /var/lib/apt/lists/*
+
+# Set GDAL environment variables
+ENV CPLUS_INCLUDE_PATH=/usr/include/gdal
+ENV C_INCLUDE_PATH=/usr/include/gdal
+ENV GDAL_VERSION=3.6.0
+
+WORKDIR /app
+
+# Install Python dependencies for HeMu
+COPY requirements-hemu.txt .
+RUN pip install --upgrade pip && \
+    pip install -r requirements-hemu.txt
+
+# Copy HeMu application code
+COPY . /app/HeMu/
+
+# Set PYTHONPATH to include both app and HeMu
+ENV PYTHONPATH="/app:/app/HeMu:/app/HeMu/scripts:$PYTHONPATH"
+
+# Create required directories
+RUN mkdir -p /app/HeMu/data/static/domainMatcher/CH && \
+    mkdir -p /app/HeMu/data/static/horayzon/CH && \
+    mkdir -p /app/HeMu/data/Helio/stats && \
+    mkdir -p /app/HeMu/runs/CH && \
+    mkdir -p /app/HeMu/configs
+
+# Make scripts executable
+RUN chmod +x /app/HeMu/setup_infrastructure.sh && \
+    chmod +x /app/HeMu/smart_hemu_processor.py
+
+EXPOSE 8080
+
+# Default command (can be overridden in docker-compose)
+CMD ["python", "/app/HeMu/smart_hemu_processor.py"]

@@ -1,0 +1,35 @@
+# Core dependencies from main app
+fastapi
+uvicorn
+sqlalchemy
+psycopg2-binary
+xarray
+netcdf4
+rioxarray
+rasterio
+python-multipart
+
+# HeMu-specific dependencies
+satpy>=0.42.0
+pyresample>=1.24.0
+eumdac>=1.0.2
+pandas>=1.5.0
+numpy>=1.21.0
+dask>=2022.8.0
+scipy>=1.9.0
+
+# Machine Learning dependencies
+torch>=1.12.0
+torchvision>=0.13.0
+# Add other ML dependencies as needed for TSViT, ResNet models
+
+# Additional satellite data processing
+pyproj>=3.4.0
+cartopy>=0.21.0
+h5py>=3.7.0
+tables>=3.7.0
+
+# Development and monitoring
+tqdm>=4.64.0
+matplotlib>=3.5.0
+seaborn>=0.11.0

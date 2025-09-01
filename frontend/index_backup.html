@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Heliomont DML - Solar Irradiance Viewer</title>
+    
+    <!-- MapLibre GL CSS -->
+    <link href='https://unpkg.com/maplibre-gl@latest/dist/maplibre-gl.css' rel='stylesheet' />
+    
+    <!-- Font Awesome for icons -->
+    <link href='https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css' rel='stylesheet' />
+    
+    <!-- Inline critical styles to ensure they load -->
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html, body { height: 100vh !important; width: 100vw !important; margin: 0 !important; padding: 0 !important; overflow: hidden !important; }
+        body { background: #1a1a1a !important; color: #ffffff; position: relative !important; }
+        #map { position: absolute !important; top: 0 !important; left: 0 !important; right: 0 !important; bottom: 0 !important; width: 100vw !important; height: 100vh !important; z-index: 1 !important; }
+        .sidebar { position: fixed !important; top: 0 !important; right: 0 !important; width: 380px !important; height: 100vh !important; background: linear-gradient(135deg, rgba(26, 26, 26, 0.95) 0%, rgba(40, 40, 40, 0.95) 100%) !important; z-index: 1000 !important; }
+    </style>
+    
+    <!-- Custom styles -->
+    <link href='styles.css?v=2' rel='stylesheet' />
+</head>
+<body>
+    <!-- Full-screen map container -->
+    <div id="map"></div>
+    
+    <!-- Collapsible sidebar -->
+    <div id="sidebar" class="sidebar">
+        <div class="sidebar-header">
+            <h2><i class="fas fa-sun"></i> Solar Irradiance</h2>
+            <button id="sidebar-toggle" class="sidebar-toggle" aria-label="Toggle sidebar">
+                <i class="fas fa-chevron-left"></i>
+            </button>
+        </div>
+        
+        <div class="sidebar-content">
+            <!-- Loading indicator -->
+            <div id="loading-indicator" class="loading-indicator">
+                <div class="spinner"></div>
+                <p>Loading data...</p>
+            </div>
+            
+            <!-- Date range info -->
+            <div class="control-section">
+                <h3><i class="fas fa-calendar"></i> Data Range</h3>
+                <p id="range-info" class="info-text">Loading date range...</p>
+            </div>
+
+            <!-- Date/Time Control -->
+            <div class="control-section">
+                <h3><i class="fas fa-clock"></i> Time Selection</h3>
+                <div class="slider-container">
+                    <input type="range" id="date-slider" min="0" value="0" step="1" class="time-slider">
+                    <div class="slider-labels">
+                        <span id="slider-start">--</span>
+                        <span id="slider-end">--</span>
+                    </div>
+                </div>
+                <div class="current-time">
+                    <strong id="current-date">Select a time</strong>
+                </div>
+                <div class="playback-controls">
+                    <button id="play-btn" class="btn btn-play" aria-label="Play animation">
+                        <i class="fas fa-play"></i>
+                    </button>
+                    <button id="pause-btn" class="btn btn-pause" style="display: none;" aria-label="Pause animation">
+                        <i class="fas fa-pause"></i>
+                    </button>
+                    <button id="reset-btn" class="btn btn-secondary" aria-label="Reset to start">
+                        <i class="fas fa-backward"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Layer Controls -->
+            <div class="control-section">
+                <h3><i class="fas fa-layer-group"></i> Basemap</h3>
+                <div class="control-group">
+                    <label for="basemap-select">Style:</label>
+                    <select id="basemap-select" class="select-input">
+                        <option value="osm">OpenStreetMap</option>
+                        <option value="satellite">Satellite</option>
+                        <option value="terrain">Terrain</option>
+                        <option value="dark">Dark</option>
+                    </select>
+                </div>
+                <div class="control-group">
+                    <label for="basemap-opacity">Opacity:</label>
+                    <input type="range" id="basemap-opacity" min="0" max="100" value="100" class="opacity-slider">
+                    <span id="basemap-opacity-value" class="opacity-value">100%</span>
+                </div>
+            </div>
+
+            <!-- Data Layer Controls -->
+            <div class="control-section">
+                <h3><i class="fas fa-chart-area"></i> Data Layer</h3>
+                <div class="control-group">
+                    <label for="data-layer">Variable:</label>
+                    <select id="data-layer" class="select-input">
+                        <option value="SISGHI-No-Horizon">Solar Irradiance</option>
+                    </select>
+                </div>
+                <div class="control-group">
+                    <label for="data-opacity">Opacity:</label>
+                    <input type="range" id="data-opacity" min="0" max="100" value="80" class="opacity-slider">
+                    <span id="data-opacity-value" class="opacity-value">80%</span>
+                </div>
+                <div class="control-group">
+                    <label for="colormap-select">Color Scheme:</label>
+                    <select id="colormap-select" class="select-input">
+                        <option value="magma">Magma (Purple-Pink)</option>
+                        <option value="viridis">Viridis (Blue-Green)</option>
+                        <option value="plasma">Plasma (Purple-Yellow)</option>
+                        <option value="turbo">Turbo (Rainbow)</option>
+                        <option value="hot">Hot (Red-Yellow)</option>
+                        <option value="cool">Cool (Blue-Cyan)</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Data Info -->
+            <div class="control-section">
+                <h3><i class="fas fa-info-circle"></i> Current Data</h3>
+                <div class="data-info">
+                    <div class="info-item">
+                        <span class="label">Min Value:</span>
+                        <span id="current-vmin" class="value">--</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="label">Max Value:</span>
+                        <span id="current-vmax" class="value">--</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="label">Unit:</span>
+                        <span class="value">W/m²</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Legend -->
+            <div class="control-section">
+                <h3><i class="fas fa-palette"></i> Color Legend</h3>
+                <div id="color-legend" class="color-legend">
+                    <div class="legend-bar"></div>
+                    <div class="legend-labels">
+                        <span id="legend-min">0</span>
+                        <span id="legend-max">1000</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Status and Debug -->
+            <div class="control-section debug-section">
+                <details>
+                    <summary><i class="fas fa-bug"></i> Debug Info</summary>
+                    <div id="debug" class="debug-info"></div>
+                    <div id="error" class="error-info"></div>
+                </details>
+            </div>
+        </div>
+    </div>
+
+    <!-- Map controls overlay -->
+    <div class="map-controls">
+        <button id="fullscreen-btn" class="map-btn" aria-label="Toggle fullscreen">
+            <i class="fas fa-expand"></i>
+        </button>
+        <button id="home-btn" class="map-btn" aria-label="Reset view">
+            <i class="fas fa-home"></i>
+        </button>
+    </div>
+
+    <!-- Notification system -->
+    <div id="notifications" class="notifications"></div>
+
+    <!-- Scripts -->
+    <script src='https://unpkg.com/maplibre-gl@latest/dist/maplibre-gl.js'></script>
+    <script src='app.js'></script>
+</body>
+</html>
